@@ -1,3 +1,0 @@
-/mnt/d/Studio/C/Bookstore-2023-main/build/CMakeFiles/code.dir
-/mnt/d/Studio/C/Bookstore-2023-main/build/CMakeFiles/edit_cache.dir
-/mnt/d/Studio/C/Bookstore-2023-main/build/CMakeFiles/rebuild_cache.dir
