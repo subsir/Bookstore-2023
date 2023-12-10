@@ -105,6 +105,10 @@ void handleInput(std::string &input) {
     }
   } else if (input == "delete") {
     getline(std::cin, input);
+    if (users.back()->rank != 7) {
+      std::cout << "Invalid\n";
+      return;
+    }
     std::istringstream stream(input);
     std::string id;
     stream >> id;
@@ -112,6 +116,59 @@ void handleInput(std::string &input) {
       int pos = user_db.index_find(id);
       if (pos != -1) {
         user_db.remove(id);
+      } else {
+        std::cout << "Invalid\n";
+      }
+    } else {
+      std::cout << "Invalid\n";
+    }
+  } else if (input == "useradd") {
+    getline(std::cin, input);
+    if (users.back()->rank < 3) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    std::istringstream stream(input);
+    std::string id, password, username, privilege;
+    stream >> id >> password >> username >> privilege;
+    if (valid_check(0, id) and valid_check(0, password) and
+        valid_check(1, username) and valid_check(2, privilege)) {
+      if (users.back()->rank <= (privilege[0] - '0')) {
+        std::cout << "Invalid\n";
+        return;
+      }
+      if (user_db.index_find(id) == -1) {
+        user_db.insert(id, username, password);
+      } else {
+        std::cout << "Invalid\n";
+      }
+    } else {
+      std::cout << "Invalid\n";
+    }
+  } else if (input == "passwd") {
+    getline(std::cin, input);
+    std::istringstream stream(input);
+    std::string id, current_password, new_password;
+    stream >> id >> current_password >> new_password;
+    if (new_password == "") {
+      if (users.back()->rank == 7) {
+        new_password = current_password;
+        current_password = "";
+      } else {
+        std::cout << "Invalid\n";
+        return;
+      }
+    }
+    if (valid_check(0, new_password)) {
+      int pos = user_db.index_find(id);
+      if (pos != -1) {
+        if (current_password == user_db.check(pos)) {
+          user_db.remove(id);
+          user_db.insert(id, "", new_password);
+          // suppose that the username will not be used
+        } else {
+          std::cout << "Invalid\n";
+        }
       } else {
         std::cout << "Invalid\n";
       }
