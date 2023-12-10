@@ -17,9 +17,11 @@ class UserfileDatabase {
   };
 
   struct Entry {
+    int priority;
     char userid[30];
     char username[30];
     char password[30];
+    Entry() : priority(0), userid{}, username{}, password{} {}
   };
 
   std::string filename;
@@ -31,8 +33,13 @@ class UserfileDatabase {
     if (!fileExists()) {
       file.open(filename, std::ios::out);
       file.close();
+      file.open("userfile_index.txt", std::ios::out);
+      file.close();
+      file.open(filename, std::ios::in | std::ios::out);
+      insert("root", "admin", "sjtu", 7);
+      file.close();
     } else {
-      file.open("index.txt", std::ios::in | std::ios::out);
+      file.open("userfile_index.txt", std::ios::in | std::ios::out);
       int num;
       file.read(reinterpret_cast<char *>(&num), sizeof(int));
       Index temp_index;
@@ -49,7 +56,7 @@ class UserfileDatabase {
 
   ~UserfileDatabase() {
     file.close();
-    file.open("index.txt", std::ios::out);
+    file.open("userfile_index.txt", std::ios::out);
     int num = index_map.size();
     file.write(reinterpret_cast<char *>(&num), sizeof(int));
     auto it = index_map.begin();
@@ -66,11 +73,12 @@ class UserfileDatabase {
   }
 
   void insert(const std::string &index, const std::string &usname,
-              const std::string &psword) {
+              const std::string &psword, int priority) {
     Entry temp_entry;
     index.copy(temp_entry.userid, index.length());
     usname.copy(temp_entry.username, usname.length());
     psword.copy(temp_entry.password, psword.length());
+    temp_entry.priority = priority;
     file.seekp(0, std::ios::end);
     index_map[index] = file.tellp();
     file.write(reinterpret_cast<char *>(&temp_entry), sizeof(Entry));
@@ -89,15 +97,7 @@ class UserfileDatabase {
     file.seekg(pos);
     Entry temp_entry;
     file.read(reinterpret_cast<char *>(&temp_entry), sizeof(Entry));
-    if (strcmp(temp_entry.userid, "manager") == 0) {
-      return 7;
-    } else if (strcmp(temp_entry.userid, "faculty") == 0) {
-      return 3;
-    } else if (strcmp(temp_entry.userid, "customer") == 0) {
-      return 1;
-    } else {
-      return 0;
-    }
+    return temp_entry.priority;
   }
   int index_find(const std::string &index) {
     auto it = index_map.find(index);
