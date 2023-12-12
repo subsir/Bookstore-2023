@@ -5,3 +5,5 @@
 /robust
 /testdir
 *.txt
+/.vscode
+/.cache
