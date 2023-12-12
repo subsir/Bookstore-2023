@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "book_info.hpp"
 #include "user.hpp"
 
 std::vector<std::shared_ptr<user>> users;
@@ -203,7 +204,13 @@ void handleInput(std::string &input) {
     } else {
       std::cout << "Invalid\n";
     }
-  } else {
+  } else if (input == "show") {
+    getline(std::cin, input);
+    std::istringstream stream(input);
+
+  }
+
+  else {
     std::cout << "Invalid\n";
     getline(std::cin, input);
   }

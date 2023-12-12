@@ -9,8 +9,8 @@
 class KeyValueDatabase {
  private:
   struct Index {
-    static const short max_size = 10;
-    char index[max_size][51];
+    static const short max_size = 1000;
+    char index[max_size][60];
     int block[max_size];
     short size = 0;
     Index() : block{}, index{} {}
@@ -27,16 +27,16 @@ class KeyValueDatabase {
   std::string filename;
   std::fstream file;
   std::vector<int> index_vec;
-  std::vector<int> value_vec;
   std::unordered_map<std::string, int> index_map;
 
  public:
+  std::vector<int> value_vec;
   KeyValueDatabase(const std::string &filename) : filename(filename) {
     if (!fileExists()) {
       file.open(filename, std::ios::out);
       file.close();
     } else {
-      file.open("index.txt", std::ios::in | std::ios::out);
+      file.open(filename + "_index.txt", std::ios::in | std::ios::out);
       int num;
       file.read(reinterpret_cast<char *>(&num), sizeof(int));
       Index temp_index;
@@ -53,7 +53,7 @@ class KeyValueDatabase {
 
   ~KeyValueDatabase() {
     file.close();
-    file.open("index.txt", std::ios::out);
+    file.open(filename + "_index.txt", std::ios::out);
     int num = index_map.size();
     file.write(reinterpret_cast<char *>(&num), sizeof(int));
     auto it = index_map.begin();
@@ -145,12 +145,25 @@ class KeyValueDatabase {
         shift_pos = temp_entry.next;
       }
     }
-    if (value_vec.empty()) {
-      std::cout << "null\n";
-    } else {
-      std::sort(value_vec.begin(), value_vec.end());
-      for (auto it : value_vec) {
-        std::cout << it << (it == value_vec.back() ? '\n' : ' ');
+  }
+  void all() {
+    value_vec.clear();
+    for (auto it : index_map) {
+      int shift_pos;
+      Entry temp_entry;
+      file.seekg(it.second, std::ios::beg);
+      file.read(reinterpret_cast<char *>(&temp_entry), sizeof(Entry));
+      for (short it = 0; it < temp_entry.top; ++it) {
+        value_vec.push_back(temp_entry.value[it]);
+      }
+      shift_pos = temp_entry.next;
+      while (shift_pos != -1) {
+        file.seekg(shift_pos, std::ios::beg);
+        file.read(reinterpret_cast<char *>(&temp_entry), sizeof(Entry));
+        for (short it = 0; it < temp_entry.top; ++it) {
+          value_vec.push_back(temp_entry.value[it]);
+        }
+        shift_pos = temp_entry.next;
       }
     }
   }

@@ -7,7 +7,7 @@
 
 class user {
  public:
-  int rank;
+  int rank, select = -1;
   std::string id;
   user(std::string &in_id, std::string &in_password)
       : id(in_id), password(in_password) {
