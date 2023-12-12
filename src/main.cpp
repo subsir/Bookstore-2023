@@ -9,12 +9,14 @@
 #include "user.hpp"
 
 std::vector<std::shared_ptr<user>> users;
+Book book_db;
 UserfileDatabase user_db("user_file.txt");
 
 bool valid_check(int type, std::string &input) {
-  if (input.size() > 30) {
+  if (input.size() > 30 and type < 3) {
     return false;
   }
+
   if (type ==
       0) {  // 0代表 [UserID], [Password], [CurrentPassword], [NewPassword]
     for (int i = 0; i < input.size(); i++) {
@@ -42,6 +44,101 @@ bool valid_check(int type, std::string &input) {
     }
     if (input[0] != '1' and input[0] != '3' and input[0] != '7') {
       return false;
+    }
+    return true;
+  }
+
+  if (type == 3) {  // 3代表[ISBN]
+    if (input == "") {
+      return false;
+    }
+    if (input.size() > 20) {
+      return false;
+    }
+    for (int i = 0; i < input.size(); i++) {
+      if (input[i] < 32 or input[i] > 126) {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (type == 4) {  // 4代表[BookName], [Author]
+    if (input == "") {
+      return false;
+    }
+    if (input.size() > 62) {
+      return false;
+    }
+    if (input[0] != '\"' or input[input.size() - 1] != '\"') {
+      return false;
+    }
+    for (int i = 1; i < input.size() - 1; i++) {
+      if (input[i] < 32 or input[i] > 126 or input[i] == '\"') {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (type == 5) {  // 5代表[Keyword]
+    if (input == "") {
+      return false;
+    }
+    if (input.size() > 62) {
+      return false;
+    }
+    if (input[0] != '\"' or input[input.size() - 1] != '\"') {
+      return false;
+    }
+    for (int i = 1; i < input.size() - 1; i++) {
+      if (input[i] < 32 or input[i] > 126 or input[i] == '\"') {
+        return false;
+      }
+      if (input[i] == '|' and (i == input.size() - 1 or input[i + 1] == '|')) {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (type == 6) {  // 6代表[Quantity]
+    if (input == "") {
+      return false;
+    }
+    if (input.size() > 10) {
+      return false;
+    }
+    if (input.size() == 10) {
+      if (input > "2147483647") {
+        return false;
+      }
+    }
+    for (int i = 0; i < input.size(); i++) {
+      if (input[i] < '0' or input[i] > '9') {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (type == 7) {  // 7代表[Price], [TotalCost]
+    if (input == "") {
+      return false;
+    }
+    if (input.size() > 13) {
+      return false;
+    }
+    int dot = -1;
+    for (int i = 0; i < input.size(); i++) {
+      if ((input[i] < '0' or input[i] > '9') and input[i] != '.') {
+        return false;
+      }
+      if (input[i] == '.') {
+        if (dot != -1) {
+          return false;
+        }
+        dot = i;
+        if (dot < input.size() - 3) {
+          return false;
+        }
+      }
     }
     return true;
   }
@@ -171,6 +268,10 @@ void handleInput(std::string &input) {
     }
   } else if (input == "passwd") {
     getline(std::cin, input);
+    if (users.empty() or users.back()->rank < 1) {
+      std::cout << "Invalid\n";
+      return;
+    }
     std::istringstream stream(input);
     std::string id, current_password, new_password, left;
     stream >> id >> current_password >> new_password >> left;
@@ -206,11 +307,214 @@ void handleInput(std::string &input) {
     }
   } else if (input == "show") {
     getline(std::cin, input);
+    if (users.empty() or users.back()->rank < 1) {
+      std::cout << "Invalid\n";
+      return;
+    }
     std::istringstream stream(input);
-
-  }
-
-  else {
+    std::string info;
+    stream >> info;
+    if (input == "") {
+      book_db.find(info, 4);
+    } else {
+      int split = -1;
+      for (int i = 1; i < info.size(); i++) {
+        if (info[i] == '=') {
+          split = i;
+          break;
+        }
+      }
+      if (split == -1 or info[0] != '-') {
+        std::cout << "Invalid\n";
+        return;
+      }
+      std::string type = info.substr(1, split - 1);
+      std::string index = info.substr(split + 1);
+      if (index == "") {
+        std::cout << "Invalid\n";
+        return;
+      }
+      if (type == "ISBN") {
+        if (valid_check(3, index) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+        book_db.find(index, 0);
+      } else if (type == "name") {
+        if (valid_check(4, index) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+        book_db.find(index, 1);
+      } else if (type == "author") {
+        if (valid_check(4, index) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+        book_db.find(index, 2);
+      } else if (type == "keyword") {
+        if (valid_check(5, index) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+        book_db.find(index, 3);
+      } else {
+        std::cout << "Invalid\n";
+      }
+    }
+  } else if (input == "buy") {
+    getline(std::cin, input);
+    if (users.empty() or users.back()->rank < 1) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    std::istringstream stream(input);
+    std::string ISBN, quantity;
+    stream >> ISBN >> quantity;
+    int quantity_int = -1;
+    if (valid_check(3, ISBN) == false) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    if (valid_check(6, quantity) == false) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    try {
+      quantity_int = std::stoi(quantity);
+    } catch (std::invalid_argument) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    if (quantity_int <= 0) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    book_db.buy(ISBN, quantity_int);
+  } else if (input == "select") {
+    getline(std::cin, input);
+    if (users.empty() or users.back()->rank < 3) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    std::istringstream stream(input);
+    std::string ISBN;
+    stream >> ISBN;
+    if (valid_check(3, ISBN) == false) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    if (ISBN == "") {
+      std::cout << "Invalid\n";
+      return;
+    }
+    if (book_db.return_index(ISBN) == -1) {
+      book_db.new_book(ISBN);
+    }
+    users.back()->select = book_db.return_index(ISBN);
+  } else if (input == "modify") {
+    getline(std::cin, input);
+    if (users.empty() or users.back()->rank < 3 or users.back()->select == -1) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    std::istringstream stream(input);
+    std::string info[5];
+    std::string ISBN, name, author, keyword, price;
+    stream >> info[0] >> info[1] >> info[2] >> info[3] >> info[4];
+    if (info[0] == "") {
+      std::cout << "Invalid\n";
+      return;
+    }
+    for (int i = 0; i < 5; i++) {
+      if (info[i] == "") {
+        break;
+      }
+      int split = -1;
+      for (int j = 1; j < info[i].size(); j++) {
+        if (info[i][j] == '=') {
+          split = j;
+          break;
+        }
+      }
+      if (split == -1 or info[i][0] != '-') {
+        std::cout << "Invalid\n";
+        return;
+      }
+      std::string type = info[i].substr(1, split - 1);
+      std::string index = info[i].substr(split + 1);
+      if (index == "") {
+        std::cout << "Invalid\n";
+        return;
+      }
+      if (type == "ISBN" and ISBN == "") {
+        ISBN = index;
+        if (valid_check(3, ISBN) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+      } else if (type == "name" and name == "") {
+        name = index;
+        if (valid_check(4, name) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+      } else if (type == "author" and author == "") {
+        author = index;
+        if (valid_check(4, author) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+      } else if (type == "keyword" and keyword == "") {
+        keyword = index;
+        if (valid_check(5, keyword) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+      } else if (type == "price" and price == "") {
+        price = index;
+        if (valid_check(7, price) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+      } else {
+        std::cout << "Invalid\n";
+        return;
+      }
+    }
+    book_db.modify(users.back()->select, ISBN, name, author, keyword, price);
+  } else if (input == "import") {
+    getline(std::cin, input);
+    if (users.empty() or users.back()->rank < 3 or users.back()->select == -1) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    std::istringstream stream(input);
+    std::string quantity, totalcost;
+    stream >> quantity >> totalcost;
+    if (quantity == "" or totalcost == "") {
+      std::cout << "Invalid\n";
+      return;
+    }
+    if (valid_check(6, quantity) == false or
+        valid_check(7, totalcost) == false) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    int quantity_int = -1, totalcost_double = -1;
+    try {
+      quantity_int = std::stoi(quantity);
+      totalcost_double = std::stod(totalcost);
+    } catch (std::invalid_argument) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    if (quantity_int <= 0 or totalcost_double <= 0) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    book_db.import(users.back()->select, quantity_int);
+  } else {
     std::cout << "Invalid\n";
     getline(std::cin, input);
   }

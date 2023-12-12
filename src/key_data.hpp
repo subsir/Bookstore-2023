@@ -32,22 +32,22 @@ class KeyValueDatabase {
  public:
   std::vector<int> value_vec;
   KeyValueDatabase(const std::string &filename) : filename(filename) {
-    if (!fileExists()) {
-      file.open(filename, std::ios::out);
-      file.close();
-    } else {
-      file.open(filename + "_index.txt", std::ios::in | std::ios::out);
-      int num;
-      file.read(reinterpret_cast<char *>(&num), sizeof(int));
-      Index temp_index;
-      for (int i = 0; i < num; i += Index::max_size) {
-        file.read(reinterpret_cast<char *>(&temp_index), sizeof(Index));
-        for (int j = 0; j < Index::max_size and i + j < num; j++) {
-          index_map[temp_index.index[j]] = temp_index.block[j];
-        }
-      }
-      file.close();
-    }
+    //  if (!fileExists()) {
+    file.open(filename, std::ios::out);
+    file.close();
+    /*} else {
+       file.open(filename + "_index.txt", std::ios::in | std::ios::out);
+       int num;
+       file.read(reinterpret_cast<char *>(&num), sizeof(int));
+       Index temp_index;
+       for (int i = 0; i < num; i += Index::max_size) {
+         file.read(reinterpret_cast<char *>(&temp_index), sizeof(Index));
+         for (int j = 0; j < Index::max_size and i + j < num; j++) {
+           index_map[temp_index.index[j]] = temp_index.block[j];
+         }
+       }
+       file.close();
+     }*/
     file.open(filename, std::ios::in | std::ios::out);
   }
 
