@@ -313,11 +313,7 @@ void handleInput(std::string &input) {
     }
     std::istringstream stream(input);
     std::string info, left;
-    stream >> info >> left;
-    if (left != "") {
-      std::cout << "Invalid\n";
-      return;
-    }
+    stream >> info;
     if (info == "") {
       book_db.find(info, 4);
     } else if (info == "finance") {
@@ -326,7 +322,11 @@ void handleInput(std::string &input) {
         return;
       }
       std::string count;
-      stream >> count;
+      stream >> count >> left;
+      if (left != "") {
+        std::cout << "Invalid\n";
+        return;
+      }
       if (count == "") {
         book_db.finance(-1);
       } else {
@@ -348,6 +348,11 @@ void handleInput(std::string &input) {
         book_db.finance(count_int);
       }
     } else {
+      stream >> left;
+      if (left != "") {
+        std::cout << "Invalid\n";
+        return;
+      }
       int split = -1;
       for (int i = 1; i < info.size(); i++) {
         if (info[i] == '=') {
