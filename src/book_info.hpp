@@ -9,10 +9,10 @@
 class Book {
  private:
   struct book {
-    char ISBN[20];
-    char name[60];
-    char author[60];
-    char keyword[60];
+    char ISBN[21];
+    char name[61];
+    char author[61];
+    char keyword[61];
     long double price = 0;
     int quantity = 0;
     bool operator<(const book &rhs) const { return strcmp(ISBN, rhs.ISBN) < 0; }
@@ -31,7 +31,7 @@ class Book {
 
   std::vector<std::string> keyword_vec;
   std::vector<book> book_vec;
-  KeyValueDatabase ISBN_db;
+  KeyValueDatabase2 ISBN_db;
   KeyValueDatabase name_db;
   KeyValueDatabase author_db;
   KeyValueDatabase keyword_db;

@@ -9,8 +9,8 @@
 class UserfileDatabase {
  private:
   struct Index {
-    static const short max_size = 1000;
-    char index[max_size][60];
+    static const short max_size = 100;
+    char index[max_size][61];
     int block[max_size];
     short size = 0;
     Index() : block{}, index{} {}
@@ -18,9 +18,9 @@ class UserfileDatabase {
 
   struct Entry {
     int priority;
-    char userid[30];
-    char username[30];
-    char password[30];
+    char userid[31];
+    char username[31];
+    char password[31];
     Entry() : priority(0), userid{}, username{}, password{} {}
   };
 
