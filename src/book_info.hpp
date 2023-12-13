@@ -13,9 +13,20 @@ class Book {
     char name[60];
     char author[60];
     char keyword[60];
-    double price;
+    long double price = 0;
     int quantity = 0;
     bool operator<(const book &rhs) const { return strcmp(ISBN, rhs.ISBN) < 0; }
+    book() {
+      ISBN[0] = '\0';
+      name[0] = '\0';
+      author[0] = '\0';
+      keyword[0] = '\0';
+    }
+  };
+
+  struct log {
+    long double profit = 0;
+    long double expense = 0;
   };
 
   std::vector<std::string> keyword_vec;
@@ -25,6 +36,7 @@ class Book {
   KeyValueDatabase author_db;
   KeyValueDatabase keyword_db;
   MemoryRiver<book> book_db;
+  MemoryRiver<log> log_db;
 
  public:
   Book()
@@ -32,7 +44,8 @@ class Book {
         name_db("name_db"),
         author_db("author_db"),
         keyword_db("keyword_db"),
-        book_db("book_db") {}
+        book_db("book_db"),
+        log_db("log_db") {}
 
   void new_book(std::string &index) {
     book temp;
@@ -83,7 +96,7 @@ class Book {
     for (auto i : book_vec) {
       std::cout << i.ISBN << '\t' << i.name << '\t' << i.author << '\t'
                 << i.keyword << '\t';
-      printf("%.2lf\t%d\n", i.price, i.quantity);
+      printf("%.2Lf\t%d\n", i.price, i.quantity);
     }
     if (book_vec.empty()) {
       std::cout << '\n';
@@ -111,14 +124,39 @@ class Book {
     }
     temp.quantity -= quantity;
     book_db.revise(temp, ISBN_db.value_vec[0]);
-    printf("%.2lf\n", temp.price * quantity);
+    long double price = temp.price * quantity;
+    printf("%.2Lf\n", price);
+    int num, pos;
+    log temp_log;
+    log_db.get_info(num, 1);
+    log_db.get_info(pos, 2);
+    if (num > 0) {
+      log_db.read(temp_log, pos);
+    }
+    temp_log.profit += price;
+    pos = log_db.write(temp_log);
+    num++;
+    log_db.write_info(num, 1);
+    log_db.write_info(pos, 2);
   }
 
-  void import(int num, int quantity) {
+  void import(int num, int quantity, long double price) {
     book temp;
     book_db.read(temp, num);
     temp.quantity += quantity;
     book_db.revise(temp, num);
+    int num2, pos;
+    log temp_log;
+    log_db.get_info(num2, 1);
+    log_db.get_info(pos, 2);
+    if (num2 > 0) {
+      log_db.read(temp_log, pos);
+    }
+    temp_log.expense += price;
+    pos = log_db.write(temp_log);
+    num2++;
+    log_db.write_info(num2, 1);
+    log_db.write_info(pos, 2);
   }
 
   void modify(int num, std::string &ISBN, std::string &name,
@@ -127,6 +165,11 @@ class Book {
     book_db.read(temp, num);
     if (ISBN != "") {
       if (temp.ISBN == ISBN) {
+        std::cout << "Invalid\n";
+        return;
+      }
+      ISBN_db.find(ISBN);
+      if (ISBN_db.value_vec.empty() == false) {
         std::cout << "Invalid\n";
         return;
       }
@@ -206,9 +249,9 @@ class Book {
       }
     }
     if (price != "") {
-      double temp_price = -1;
+      long double temp_price = -1;
       try {
-        temp_price = std::stod(price);
+        temp_price = std::stold(price);
       } catch (std::invalid_argument) {
         std::cout << "Invalid\n";
         return;
@@ -216,5 +259,28 @@ class Book {
       temp.price = temp_price;
     }
     book_db.revise(temp, num);
+  }
+
+  void finance(int count) {
+    int num, pos;
+    log temp_log, temp_log2;
+    log_db.get_info(num, 1);
+    log_db.get_info(pos, 2);
+    if (num < count) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    log_db.read(temp_log, pos);
+    if (count == -1 or count == num) {
+      printf("+ %.2Lf ", temp_log.profit);
+      printf("- %.2Lf\n", temp_log.expense);
+      return;
+    }
+    log_db.read(temp_log2, pos - count);
+    long double profit = temp_log.profit - temp_log2.profit;
+    long double expense = temp_log.expense - temp_log2.expense;
+    printf("+ %.2Lf ", profit);
+    printf("- %.2Lf\n", expense);
+    return;
   }
 };

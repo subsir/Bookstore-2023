@@ -99,7 +99,7 @@ bool valid_check(int type, std::string &input) {
     }
     return true;
   }
-  if (type == 6) {  // 6代表[Quantity]
+  if (type == 6) {  // 6代表[Quantity]，[Count]
     if (input == "") {
       return false;
     }
@@ -314,8 +314,35 @@ void handleInput(std::string &input) {
     std::istringstream stream(input);
     std::string info;
     stream >> info;
-    if (input == "") {
+    if (info == "") {
       book_db.find(info, 4);
+    } else if (info == "finance") {
+      if (users.empty() or users.back()->rank < 7) {
+        std::cout << "Invalid\n";
+        return;
+      }
+      std::string count;
+      stream >> count;
+      if (count == "") {
+        book_db.finance(-1);
+      } else {
+        if (valid_check(6, count) == false) {
+          std::cout << "Invalid\n";
+          return;
+        }
+        int count_int = -1;
+        try {
+          count_int = std::stoi(count);
+        } catch (std::invalid_argument) {
+          std::cout << "Invalid\n";
+          return;
+        }
+        if (count_int <= 0) {
+          std::cout << "Invalid\n";
+          return;
+        }
+        book_db.finance(count_int);
+      }
     } else {
       int split = -1;
       for (int i = 1; i < info.size(); i++) {
@@ -501,10 +528,11 @@ void handleInput(std::string &input) {
       std::cout << "Invalid\n";
       return;
     }
-    int quantity_int = -1, totalcost_double = -1;
+    int quantity_int = -1;
+    long double totalcost_double = -1;
     try {
       quantity_int = std::stoi(quantity);
-      totalcost_double = std::stod(totalcost);
+      totalcost_double = std::stold(totalcost);
     } catch (std::invalid_argument) {
       std::cout << "Invalid\n";
       return;
@@ -513,7 +541,7 @@ void handleInput(std::string &input) {
       std::cout << "Invalid\n";
       return;
     }
-    book_db.import(users.back()->select, quantity_int);
+    book_db.import(users.back()->select, quantity_int, totalcost_double);
   } else {
     std::cout << "Invalid\n";
     getline(std::cin, input);

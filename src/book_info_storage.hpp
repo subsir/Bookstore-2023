@@ -18,9 +18,9 @@ class MemoryRiver {
 
  public:
   MemoryRiver(const string &file_name) : file_name(file_name) {
-    // if (!fileExists()) {
-    initialise();
-    // }
+    if (!fileExists()) {
+      initialise();
+    }
     file.open(file_name, std::ios::in | std::ios::out);
   }
   ~MemoryRiver() { file.close(); }
