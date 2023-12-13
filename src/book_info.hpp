@@ -40,12 +40,12 @@ class Book {
 
  public:
   Book()
-      : ISBN_db("ISBN_db"),
-        name_db("name_db"),
-        author_db("author_db"),
-        keyword_db("keyword_db"),
-        book_db("book_db"),
-        log_db("log_db") {}
+      : ISBN_db("_ISBN_db"),
+        name_db("_name_db"),
+        author_db("_author_db"),
+        keyword_db("_keyword_db"),
+        book_db("_book_db"),
+        log_db("_log_db") {}
 
   void new_book(std::string &index) {
     book temp;
@@ -58,12 +58,15 @@ class Book {
     book_vec.clear();
     if (type == 0) {
       ISBN_db.find(index);
-      for (auto i : ISBN_db.value_vec) {
-        book temp;
-        book_db.read(temp, i);
-        book_vec.push_back(temp);
+      if (ISBN_db.value_vec.empty()) {
+        std::cout << '\n';
+        return;
       }
+      book temp;
+      book_db.read(temp, ISBN_db.value_vec[0]);
+      book_vec.push_back(temp);
     } else if (type == 1) {
+      index = index.substr(1, index.length() - 2);
       name_db.find(index);
       for (auto i : name_db.value_vec) {
         book temp;
@@ -71,6 +74,7 @@ class Book {
         book_vec.push_back(temp);
       }
     } else if (type == 2) {
+      index = index.substr(1, index.length() - 2);
       author_db.find(index);
       for (auto i : author_db.value_vec) {
         book temp;
@@ -163,6 +167,44 @@ class Book {
               std::string &author, std::string &keyword, std::string &price) {
     book temp;
     book_db.read(temp, num);
+    if (keyword != "") {
+      std::string keyword2 = keyword.substr(1, keyword.length() - 2);
+      keyword_vec.clear();
+      int split = -1;
+      while (keyword2 != "") {
+        split = keyword2.find('|');
+        if (split == -1) {
+          if (std::find(keyword_vec.begin(), keyword_vec.end(), keyword2) ==
+              keyword_vec.end()) {
+            keyword_vec.push_back(keyword2);
+          } else {
+            std::cout << "Invalid\n";
+            return;
+          }
+          keyword2 = "";
+        } else {
+          std::string temp = keyword2.substr(0, split);
+          if (std::find(keyword_vec.begin(), keyword_vec.end(), temp) ==
+              keyword_vec.end()) {
+            keyword_vec.push_back(temp);
+            keyword2 = keyword2.substr(split + 1);
+          } else {
+            std::cout << "Invalid\n";
+            return;
+          }
+        }
+      }
+    }
+    if (price != "") {
+      long double temp_price = -1;
+      try {
+        temp_price = std::stold(price);
+      } catch (std::invalid_argument) {
+        std::cout << "Invalid\n";
+        return;
+      }
+      temp.price = temp_price;
+    }
     if (ISBN != "") {
       if (temp.ISBN == ISBN) {
         std::cout << "Invalid\n";
@@ -178,16 +220,16 @@ class Book {
       ISBN_db.insert(ISBN, num);
     }
     if (name != "") {
-      name_db.remove(temp.name, num);
       std::string index = name.substr(1, name.length() - 2);
+      name_db.remove(temp.name, num);
       strcpy(temp.name, index.c_str());
-      name_db.insert(name, num);
+      name_db.insert(index, num);
     }
     if (author != "") {
-      author_db.remove(temp.author, num);
       std::string index = author.substr(1, author.length() - 2);
+      author_db.remove(temp.author, num);
       strcpy(temp.author, index.c_str());
-      author_db.insert(author, num);
+      author_db.insert(index, num);
     }
     if (keyword != "") {
       keyword_vec.clear();
@@ -247,16 +289,6 @@ class Book {
         }
         keyword_db.insert(i, num);
       }
-    }
-    if (price != "") {
-      long double temp_price = -1;
-      try {
-        temp_price = std::stold(price);
-      } catch (std::invalid_argument) {
-        std::cout << "Invalid\n";
-        return;
-      }
-      temp.price = temp_price;
     }
     book_db.revise(temp, num);
   }

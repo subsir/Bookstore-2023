@@ -33,13 +33,13 @@ class UserfileDatabase {
     if (!fileExists()) {
       file.open(filename, std::ios::out);
       file.close();
-      file.open("userfile_index.txt", std::ios::out);
+      file.open("_userfile_index", std::ios::out);
       file.close();
       file.open(filename, std::ios::in | std::ios::out);
       insert("root", "admin", "sjtu", 7);
       file.close();
     } else {
-      file.open("userfile_index.txt", std::ios::in | std::ios::out);
+      file.open("_userfile_index", std::ios::in | std::ios::out);
       int num;
       file.read(reinterpret_cast<char *>(&num), sizeof(int));
       Index temp_index;
@@ -56,7 +56,7 @@ class UserfileDatabase {
 
   ~UserfileDatabase() {
     file.close();
-    file.open("userfile_index.txt", std::ios::out);
+    file.open("_userfile_index", std::ios::out);
     int num = index_map.size();
     file.write(reinterpret_cast<char *>(&num), sizeof(int));
     auto it = index_map.begin();

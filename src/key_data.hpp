@@ -36,7 +36,7 @@ class KeyValueDatabase {
       file.open(filename, std::ios::out);
       file.close();
     } else {
-      file.open(filename + "_index.txt", std::ios::in | std::ios::out);
+      file.open(filename + "_index", std::ios::in | std::ios::out);
       int num;
       file.read(reinterpret_cast<char *>(&num), sizeof(int));
       Index temp_index;
@@ -53,7 +53,7 @@ class KeyValueDatabase {
 
   ~KeyValueDatabase() {
     file.close();
-    file.open(filename + "_index.txt", std::ios::out);
+    file.open(filename + "_index", std::ios::out);
     int num = index_map.size();
     file.write(reinterpret_cast<char *>(&num), sizeof(int));
     auto it = index_map.begin();
@@ -217,7 +217,7 @@ class KeyValueDatabase2 {
       file.open(filename, std::ios::out);
       file.close();
     } else {
-      file.open(filename + "_index.txt", std::ios::in | std::ios::out);
+      file.open(filename + "_index", std::ios::in | std::ios::out);
       int num;
       file.read(reinterpret_cast<char *>(&num), sizeof(int));
       Index temp_index;
@@ -234,7 +234,7 @@ class KeyValueDatabase2 {
 
   ~KeyValueDatabase2() {
     file.close();
-    file.open(filename + "_index.txt", std::ios::out);
+    file.open(filename + "_index", std::ios::out);
     int num = index_map.size();
     file.write(reinterpret_cast<char *>(&num), sizeof(int));
     auto it = index_map.begin();

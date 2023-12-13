@@ -10,7 +10,7 @@
 
 std::vector<std::shared_ptr<user>> users;
 Book book_db;
-UserfileDatabase user_db("user_file.txt");
+UserfileDatabase user_db("_user_file");
 
 bool valid_check(int type, std::string &input) {
   if (input.size() > 30 and type < 3) {
@@ -66,7 +66,7 @@ bool valid_check(int type, std::string &input) {
     if (input == "") {
       return false;
     }
-    if (input.size() > 62) {
+    if (input.size() > 60) {
       return false;
     }
     if (input[0] != '\"' or input[input.size() - 1] != '\"') {
@@ -83,7 +83,7 @@ bool valid_check(int type, std::string &input) {
     if (input == "") {
       return false;
     }
-    if (input.size() > 62) {
+    if (input.size() > 60) {
       return false;
     }
     if (input[0] != '\"' or input[input.size() - 1] != '\"') {
@@ -162,7 +162,7 @@ void handleInput(std::string &input) {
     int temp_priority = 0;
     if (pos != -1) {
       temp_priority = user_db.get_priority(pos);
-      if (users.empty() != true and temp_priority > users.back()->rank) {
+      if (users.empty() != true and temp_priority < users.back()->rank) {
         login = true;
       }
       if (password == user_db.check(pos)) {
@@ -550,11 +550,11 @@ void handleInput(std::string &input) {
 
 int main() {
   std::string input;
-
-  while (true) {
-    std::cin >> input;
+  while (!std::cin.eof()) {
+    if (!(std::cin >> input)) {
+      break;
+    }
     handleInput(input);
   }
-
   return 0;
 }
