@@ -312,8 +312,12 @@ void handleInput(std::string &input) {
       return;
     }
     std::istringstream stream(input);
-    std::string info;
-    stream >> info;
+    std::string info, left;
+    stream >> info >> left;
+    if (left != "") {
+      std::cout << "Invalid\n";
+      return;
+    }
     if (info == "") {
       book_db.find(info, 4);
     } else if (info == "finance") {
@@ -396,8 +400,12 @@ void handleInput(std::string &input) {
       return;
     }
     std::istringstream stream(input);
-    std::string ISBN, quantity;
-    stream >> ISBN >> quantity;
+    std::string ISBN, quantity, left;
+    stream >> ISBN >> quantity >> left;
+    if (left != "") {
+      std::cout << "Invalid\n";
+      return;
+    }
     int quantity_int = -1;
     if (valid_check(3, ISBN) == false) {
       std::cout << "Invalid\n";
@@ -425,8 +433,12 @@ void handleInput(std::string &input) {
       return;
     }
     std::istringstream stream(input);
-    std::string ISBN;
-    stream >> ISBN;
+    std::string ISBN, left;
+    stream >> ISBN >> left;
+    if (left != "") {
+      std::cout << "Invalid\n";
+      return;
+    }
     if (valid_check(3, ISBN) == false) {
       std::cout << "Invalid\n";
       return;
@@ -447,8 +459,12 @@ void handleInput(std::string &input) {
     }
     std::istringstream stream(input);
     std::string info[5];
-    std::string ISBN, name, author, keyword, price;
-    stream >> info[0] >> info[1] >> info[2] >> info[3] >> info[4];
+    std::string ISBN, name, author, keyword, price, left;
+    stream >> info[0] >> info[1] >> info[2] >> info[3] >> info[4] >> left;
+    if (left != "") {
+      std::cout << "Invalid\n";
+      return;
+    }
     if (info[0] == "") {
       std::cout << "Invalid\n";
       return;
@@ -517,8 +533,12 @@ void handleInput(std::string &input) {
       return;
     }
     std::istringstream stream(input);
-    std::string quantity, totalcost;
-    stream >> quantity >> totalcost;
+    std::string quantity, totalcost, left;
+    stream >> quantity >> totalcost >> left;
+    if (left != "") {
+      std::cout << "Invalid\n";
+      return;
+    }
     if (quantity == "" or totalcost == "") {
       std::cout << "Invalid\n";
       return;
