@@ -10,7 +10,7 @@ class UserfileDatabase {
  private:
   struct Index {
     static const short max_size = 1000;
-    char index[max_size][51];
+    char index[max_size][60];
     int block[max_size];
     short size = 0;
     Index() : block{}, index{} {}
