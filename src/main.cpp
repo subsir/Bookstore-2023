@@ -433,6 +433,10 @@ void handleInput(std::string &input) {
           std::cout << "Invalid\n";
           return;
         }
+        if (index.find('|') != -1) {
+          std::cout << "Invalid\n";
+          return;
+        }
         book_db.find(index, 3);
       } else {
         std::cout << "Invalid\n";
