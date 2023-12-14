@@ -42,7 +42,8 @@ bool valid_check(int type, std::string &input) {
     if (input.size() != 1) {
       return false;
     }
-    if (input[0] != '1' and input[0] != '3' and input[0] != '7') {
+    if (input[0] != '0' and input[0] != '1' and input[0] != '3' and
+        input[0] != '7') {
       return false;
     }
     return true;
@@ -66,7 +67,7 @@ bool valid_check(int type, std::string &input) {
     if (input == "") {
       return false;
     }
-    if (input.size() > 60) {
+    if (input.size() > 62) {
       return false;
     }
     if (input[0] != '\"' or input[input.size() - 1] != '\"') {
@@ -80,10 +81,10 @@ bool valid_check(int type, std::string &input) {
     return true;
   }
   if (type == 5) {  // 5代表[Keyword]
-    if (input == "") {
+    if (input == "\"\"") {
       return false;
     }
-    if (input.size() > 60) {
+    if (input.size() > 62) {
       return false;
     }
     if (input[0] != '\"' or input[input.size() - 1] != '\"') {
@@ -93,7 +94,10 @@ bool valid_check(int type, std::string &input) {
       if (input[i] < 32 or input[i] > 126 or input[i] == '\"') {
         return false;
       }
-      if (input[i] == '|' and (i == input.size() - 1 or input[i + 1] == '|')) {
+      if (input[i] == '|' and (i == input.size() - 2 or input[i + 1] == '|')) {
+        return false;
+      }
+      if (input[i] == '|' and (i == 1 or input[i - 1] == '|')) {
         return false;
       }
     }
@@ -341,7 +345,7 @@ void handleInput(std::string &input) {
           std::cout << "Invalid\n";
           return;
         }
-        if (count_int <= 0) {
+        if (count_int < 0) {
           std::cout << "Invalid\n";
           return;
         }
