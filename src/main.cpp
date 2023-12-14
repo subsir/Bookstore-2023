@@ -175,13 +175,49 @@ void handleInput(std::string &input) {
     }
     if (login) {
       if (temp_priority == 1) {
-        std::shared_ptr<user> ptr = std::make_shared<customer>(id, password);
+        int exist = -1;
+        for (int i = 0; i < users.size(); i++) {
+          if (users[i]->id == id) {
+            exist = i;
+            break;
+          }
+        }
+        std::shared_ptr<user> ptr;
+        if (exist != -1) {
+          ptr = users[exist];
+        } else {
+          ptr = std::make_shared<customer>(id, password);
+        }
         users.push_back(ptr);
       } else if (temp_priority == 3) {
-        std::shared_ptr<user> ptr = std::make_shared<faculty>(id, password);
+        int exist = -1;
+        for (int i = 0; i < users.size(); i++) {
+          if (users[i]->id == id) {
+            exist = i;
+            break;
+          }
+        }
+        std::shared_ptr<user> ptr;
+        if (exist != -1) {
+          ptr = users[exist];
+        } else {
+          ptr = std::make_shared<faculty>(id, password);
+        }
         users.push_back(ptr);
       } else if (temp_priority == 7) {
-        std::shared_ptr<user> ptr = std::make_shared<manager>(id, password);
+        int exist = -1;
+        for (int i = 0; i < users.size(); i++) {
+          if (users[i]->id == id) {
+            exist = i;
+            break;
+          }
+        }
+        std::shared_ptr<user> ptr;
+        if (exist != -1) {
+          ptr = users[exist];
+        } else {
+          ptr = std::make_shared<manager>(id, password);
+        }
         users.push_back(ptr);
       }
     } else {
