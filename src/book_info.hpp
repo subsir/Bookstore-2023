@@ -302,6 +302,10 @@ class Book {
       std::cout << "Invalid\n";
       return;
     }
+    if (count == 0) {
+      std::cout << '\n';
+      return;
+    }
     log_db.read(temp_log, pos);
     if (count == -1 or count == num) {
       printf("+ %.2Lf ", temp_log.profit);
