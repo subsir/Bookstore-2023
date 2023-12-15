@@ -151,14 +151,6 @@ bool valid_check(int type, std::string &input) {
 
 void handleInput(std::string &input) {
   if (input == "exit" or input == "quit") {
-    getline(std::cin, input);
-    std::istringstream stream(input);
-    std::string left;
-    stream >> left;
-    if (left != "") {
-      std::cout << "Invalid\n";
-      return;
-    }
     exit(0);
   } else if (input == "su") {
     getline(std::cin, input);
@@ -180,36 +172,58 @@ void handleInput(std::string &input) {
       if (password == user_db.check(pos)) {
         login = true;
       }
-      if (password != user_db.check(pos) and password != "") {
-        login = false;
-      }
     }
     if (login) {
       if (temp_priority == 1) {
+        int exist = -1;
+        for (int i = 0; i < users.size(); i++) {
+          if (users[i]->id == id) {
+            exist = i;
+            break;
+          }
+        }
         std::shared_ptr<user> ptr;
-        ptr = std::make_shared<customer>(id, password);
+        if (exist != -1) {
+          ptr = users[exist];
+        } else {
+          ptr = std::make_shared<customer>(id, password);
+        }
         users.push_back(ptr);
       } else if (temp_priority == 3) {
+        int exist = -1;
+        for (int i = 0; i < users.size(); i++) {
+          if (users[i]->id == id) {
+            exist = i;
+            break;
+          }
+        }
         std::shared_ptr<user> ptr;
-        ptr = std::make_shared<faculty>(id, password);
+        if (exist != -1) {
+          ptr = users[exist];
+        } else {
+          ptr = std::make_shared<faculty>(id, password);
+        }
         users.push_back(ptr);
       } else if (temp_priority == 7) {
+        int exist = -1;
+        for (int i = 0; i < users.size(); i++) {
+          if (users[i]->id == id) {
+            exist = i;
+            break;
+          }
+        }
         std::shared_ptr<user> ptr;
-        ptr = std::make_shared<manager>(id, password);
+        if (exist != -1) {
+          ptr = users[exist];
+        } else {
+          ptr = std::make_shared<manager>(id, password);
+        }
         users.push_back(ptr);
       }
     } else {
       std::cout << "Invalid" << std::endl;
     }
   } else if (input == "logout") {
-    getline(std::cin, input);
-    std::istringstream stream(input);
-    std::string left;
-    stream >> left;
-    if (left != "") {
-      std::cout << "Invalid\n";
-      return;
-    }
     if (users.empty()) {
       std::cout << "Invalid" << std::endl;
     } else {
@@ -306,8 +320,7 @@ void handleInput(std::string &input) {
       return;
     }
     if (new_password == "") {
-      if (users.empty() == false and users.back()->rank == 7 and
-          new_password == "") {
+      if (users.empty() == false and users.back()->rank == 7) {
         new_password = current_password;
         current_password = "";
       } else {
