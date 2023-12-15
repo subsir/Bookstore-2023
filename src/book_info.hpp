@@ -14,7 +14,7 @@ class Book {
     char author[61];
     char keyword[61];
     long double price = 0;
-    int quantity = 0;
+    long long quantity = 0;
     bool operator<(const book &rhs) const { return strcmp(ISBN, rhs.ISBN) < 0; }
     book() {
       ISBN[0] = '\0';
@@ -114,7 +114,7 @@ class Book {
     }
     return ISBN_db.value_vec[0];
   }
-  void buy(std::string &index, int quantity) {
+  void buy(std::string &index, long long quantity) {
     ISBN_db.find(index);
     if (ISBN_db.value_vec.empty()) {
       std::cout << "Invalid\n";

@@ -442,7 +442,7 @@ void handleInput(std::string &input) {
       std::cout << "Invalid\n";
       return;
     }
-    int quantity_int = -1;
+    long long quantity_int = -1;
     if (valid_check(3, ISBN) == false) {
       std::cout << "Invalid\n";
       return;
@@ -452,7 +452,7 @@ void handleInput(std::string &input) {
       return;
     }
     try {
-      quantity_int = std::stoi(quantity);
+      quantity_int = std::stoll(quantity);
     } catch (std::invalid_argument) {
       std::cout << "Invalid\n";
       return;
@@ -584,10 +584,10 @@ void handleInput(std::string &input) {
       std::cout << "Invalid\n";
       return;
     }
-    int quantity_int = -1;
+    long long quantity_int = -1;
     long double totalcost_double = -1;
     try {
-      quantity_int = std::stoi(quantity);
+      quantity_int = std::stoll(quantity);
       totalcost_double = std::stold(totalcost);
     } catch (std::invalid_argument) {
       std::cout << "Invalid\n";
