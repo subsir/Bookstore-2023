@@ -135,13 +135,10 @@ bool valid_check(int type, std::string &input) {
         return false;
       }
       if (input[i] == '.') {
-        if (dot != -1) {
+        if (dot != -1 or i == 0 or i == input.size() - 1) {
           return false;
         }
         dot = i;
-        if (dot < input.size() - 3) {
-          return false;
-        }
       }
     }
     return true;
