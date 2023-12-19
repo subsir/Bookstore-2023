@@ -6,10 +6,14 @@
 #include <vector>
 
 #include "book_info.hpp"
+#include "log.hpp"
 #include "user.hpp"
 
 std::vector<std::shared_ptr<user>> users;
 Book book_db;
+Log log_db("_log_file");
+Log faculty_log_db("_faculty_log_file");
+Log finance_log_db("_finance_log_file");
 UserfileDatabase user_db("_user_file");
 
 bool valid_check(int type, std::string &input) {
@@ -22,9 +26,7 @@ bool valid_check(int type, std::string &input) {
     for (int i = 0; i < input.size(); i++) {
       if ((input[i] < '0' or input[i] > '9') and
           (input[i] < 'a' or input[i] > 'z') and
-          (input[i] < 'A' or input[i] > 'Z') and
-          (input[i] < 'a' or input[i] > 'z') and
-          (input[i] < 'a' or input[i] > 'z') and input[i] != '_') {
+          (input[i] < 'A' or input[i] > 'Z') and input[i] != '_') {
         return false;
       }
     }
@@ -225,6 +227,8 @@ void handleInput(std::string &input) {
         valid_check(1, username)) {
       if (user_db.index_find(id) == -1) {
         user_db.insert(id, username, password, 1);
+        log_db.write("register id: " + id + " username: " + username +
+                     " password: " + password);
       } else {
         std::cout << "Invalid\n";
       }
@@ -255,6 +259,8 @@ void handleInput(std::string &input) {
       int pos = user_db.index_find(id);
       if (pos != -1) {
         user_db.remove(id);
+        log_db.write(users.back()->id + " delete id: " + id);
+        faculty_log_db.write(users.back()->id + " delete id: " + id);
       } else {
         std::cout << "Invalid\n";
       }
@@ -283,6 +289,11 @@ void handleInput(std::string &input) {
       }
       if (user_db.index_find(id) == -1) {
         user_db.insert(id, username, password, (privilege[0] - '0'));
+        log_db.write(users.back()->id + " add id: " + id +
+                     " username: " + username + " password: " + password);
+        faculty_log_db.write(users.back()->id + " add id: " + id +
+                             " username: " + username +
+                             " password: " + password);
       } else {
         std::cout << "Invalid\n";
       }
@@ -319,6 +330,10 @@ void handleInput(std::string &input) {
           int priority = user_db.get_priority(pos);
           user_db.remove(id);
           user_db.insert(id, "", new_password, priority);
+          log_db.write(users.back()->id + " change password id: " + id +
+                       " password: " + new_password);
+          faculty_log_db.write(users.back()->id + " change password id: " + id +
+                               " password: " + new_password);
           // suppose that the username will not be used
         } else {
           std::cout << "Invalid\n";
@@ -458,7 +473,8 @@ void handleInput(std::string &input) {
       std::cout << "Invalid\n";
       return;
     }
-    book_db.buy(ISBN, quantity_int);
+    book_db.buy(ISBN, quantity_int, log_db, finance_log_db, faculty_log_db,
+                users.back()->id, users.back()->rank);
   } else if (input == "select") {
     getline(std::cin, input);
     if (users.empty() or users.back()->rank < 3) {
@@ -558,7 +574,8 @@ void handleInput(std::string &input) {
         return;
       }
     }
-    book_db.modify(users.back()->select, ISBN, name, author, keyword, price);
+    book_db.modify(users.back()->select, ISBN, name, author, keyword, price,
+                   log_db, faculty_log_db, users.back()->id);
   } else if (input == "import") {
     getline(std::cin, input);
     if (users.empty() or users.back()->rank < 3 or users.back()->select == -1) {
@@ -594,7 +611,53 @@ void handleInput(std::string &input) {
       std::cout << "Invalid\n";
       return;
     }
-    book_db.import(users.back()->select, quantity_int, totalcost_double);
+    book_db.import(users.back()->select, quantity_int, totalcost_double, log_db,
+                   faculty_log_db, finance_log_db, users.back()->id);
+  } else if (input == "report") {
+    std::cin >> input;
+    if (input == "finance") {
+      getline(std::cin, input);
+      if (users.empty() or users.back()->rank < 7) {
+        std::cout << "Invalid\n";
+        return;
+      }
+      std::istringstream stream(input);
+      std::string left;
+      stream >> left;
+      if (left != "") {
+        std::cout << "Invalid\n";
+        return;
+      }
+      finance_log_db.read();
+    } else if (input == "employee") {
+      getline(std::cin, input);
+      if (users.empty() or users.back()->rank < 7) {
+        std::cout << "Invalid\n";
+        return;
+      }
+      std::istringstream stream(input);
+      std::string left;
+      stream >> left;
+      if (left != "") {
+        std::cout << "Invalid\n";
+        return;
+      }
+      faculty_log_db.read();
+    }
+  } else if (input == "log") {
+    getline(std::cin, input);
+    if (users.empty() or users.back()->rank < 7) {
+      std::cout << "Invalid\n";
+      return;
+    }
+    std::istringstream stream(input);
+    std::string left;
+    stream >> left;
+    if (left != "") {
+      std::cout << "Invalid\n";
+      return;
+    }
+    log_db.read();
   } else {
     std::cout << "Invalid\n";
     getline(std::cin, input);

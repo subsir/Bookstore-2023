@@ -1,3 +1,5 @@
+#ifndef BOOK_INFO_HPP
+#define BOOK_INFO_HPP
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
@@ -5,7 +7,7 @@
 
 #include "book_info_storage.hpp"
 #include "key_data.hpp"
-
+#include "log.hpp"
 class Book {
  private:
   struct book {
@@ -114,7 +116,8 @@ class Book {
     }
     return ISBN_db.value_vec[0];
   }
-  void buy(std::string &index, long long quantity) {
+  void buy(std::string &index, long long quantity, Log &logdb,
+           Log &finance_logdb, Log &faculty_logdb, std::string &id, int rank) {
     ISBN_db.find(index);
     if (ISBN_db.value_vec.empty()) {
       std::cout << "Invalid\n";
@@ -142,9 +145,20 @@ class Book {
     num++;
     log_db.write_info(num, 1);
     log_db.write_info(pos, 2);
+    logdb.write(id + " buy ISBN: " + index + " quantity: " +
+                std::to_string(quantity) + " cost: " + std::to_string(price));
+    finance_logdb.write(id + " buy ISBN: " + index +
+                        " quantity: " + std::to_string(quantity) +
+                        " cost: " + std::to_string(price));
+    if (rank >= 3) {
+      faculty_logdb.write(id + " buy ISBN: " + index +
+                          " quantity: " + std::to_string(quantity) +
+                          " cost: " + std::to_string(price));
+    }
   }
 
-  void import(int num, int quantity, long double price) {
+  void import(int num, int quantity, long double price, Log &logdb,
+              Log &faculty_logdb, Log &finance_log_db, std::string &id) {
     book temp;
     book_db.read(temp, num);
     temp.quantity += quantity;
@@ -161,10 +175,19 @@ class Book {
     num2++;
     log_db.write_info(num2, 1);
     log_db.write_info(pos, 2);
+    logdb.write(id + " import ISBN: " + temp.ISBN + " quantity: " +
+                std::to_string(quantity) + " cost: " + std::to_string(price));
+    faculty_logdb.write(id + " import ISBN: " + temp.ISBN +
+                        " quantity: " + std::to_string(quantity) +
+                        " cost: " + std::to_string(price));
+    finance_log_db.write(id + " import ISBN: " + temp.ISBN +
+                         " quantity: " + std::to_string(quantity) +
+                         " cost: " + std::to_string(price));
   }
 
   void modify(int num, std::string &ISBN, std::string &name,
-              std::string &author, std::string &keyword, std::string &price) {
+              std::string &author, std::string &keyword, std::string &price,
+              Log &logdb, Log &faculty_logdb, std::string &id) {
     book temp;
     book_db.read(temp, num);
     if (keyword != "") {
@@ -291,6 +314,14 @@ class Book {
       }
     }
     book_db.revise(temp, num);
+    logdb.write(id + " modify ISBN: " + temp.ISBN +
+                " as bookname: " + temp.name + " author: " + temp.author +
+                " keyword: " + temp.keyword +
+                " price: " + std::to_string(temp.price));
+    faculty_logdb.write(
+        id + " modify ISBN: " + temp.ISBN + " as bookname: " + temp.name +
+        " author: " + temp.author + " keyword: " + temp.keyword +
+        " price: " + std::to_string(temp.price));
   }
 
   void finance(int count) {
@@ -320,3 +351,4 @@ class Book {
     return;
   }
 };
+#endif

@@ -1,3 +1,5 @@
+#ifndef KEY_DATA_HPP
+#define KEY_DATA_HPP
 #include <algorithm>
 #include <cstring>
 #include <fstream>
@@ -279,3 +281,4 @@ class KeyValueDatabase2 {
     return file2.good();  // 文件存在时返回 true，否则返回 false
   }
 };
+#endif

@@ -1,5 +1,5 @@
-#ifndef BPT_MEMORYRIVER_HPP
-#define BPT_MEMORYRIVER_HPP
+#ifndef BOOK_INFO_STORAGE_HPP
+#define BOOK_INFO_STORAGE_HPP
 
 #include <fstream>
 #include <ios>
@@ -83,4 +83,4 @@ class MemoryRiver {
   }
 };
 
-#endif  // BPT_MEMORYRIVER_HPP
+#endif  // BOOK_INFO_STORAGE_HPP

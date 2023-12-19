@@ -1,3 +1,5 @@
+#ifndef USER_FILE_STORAGE_HPP
+#define USER_FILE_STORAGE_HPP
 #include <algorithm>
 #include <cstring>
 #include <fstream>
@@ -113,3 +115,4 @@ class UserfileDatabase {
     return file2.good();  // 文件存在时返回 true，否则返回 false
   }
 };
+#endif
