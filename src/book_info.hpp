@@ -61,7 +61,7 @@ class Book {
     if (type == 0) {
       ISBN_db.find(index);
       if (ISBN_db.value_vec.empty()) {
-        std::cout << '\n';
+        std::cout << "\n\n";
         return;
       }
       book temp;
@@ -104,9 +104,7 @@ class Book {
                 << i.keyword << '\t';
       printf("%.2Lf\t%d\n", i.price, i.quantity);
     }
-    if (book_vec.empty()) {
-      std::cout << '\n';
-    }
+    std::cout << '\n';
   }
 
   int return_index(std::string &index) {
@@ -183,6 +181,7 @@ class Book {
     finance_log_db.write(id + " import ISBN: " + temp.ISBN +
                          " quantity: " + std::to_string(quantity) +
                          " cost: " + std::to_string(price));
+    std::cout << "\n";
   }
 
   void modify(int num, std::string &ISBN, std::string &name,
@@ -322,6 +321,7 @@ class Book {
         id + " modify ISBN: " + temp.ISBN + " as bookname: " + temp.name +
         " author: " + temp.author + " keyword: " + temp.keyword +
         " price: " + std::to_string(temp.price));
+    std::cout << "\n";
   }
 
   void finance(int count) {
@@ -330,24 +330,24 @@ class Book {
     log_db.get_info(num, 1);
     log_db.get_info(pos, 2);
     if (num < count) {
-      std::cout << "Invalid\n";
+      std::cout << "Invalid\n\n";
       return;
     }
     if (count == 0) {
-      std::cout << '\n';
+      std::cout << "\n\n";
       return;
     }
     log_db.read(temp_log, pos);
     if (count == -1 or count == num) {
       printf("+ %.2Lf ", temp_log.profit);
-      printf("- %.2Lf\n", temp_log.expense);
+      printf("- %.2Lf\n\n", temp_log.expense);
       return;
     }
     log_db.read(temp_log2, pos - count);
     long double profit = temp_log.profit - temp_log2.profit;
     long double expense = temp_log.expense - temp_log2.expense;
     printf("+ %.2Lf ", profit);
-    printf("- %.2Lf\n", expense);
+    printf("- %.2Lf\n\n", expense);
     return;
   }
 };

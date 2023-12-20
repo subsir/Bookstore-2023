@@ -29,7 +29,7 @@ class Log {
     file.open(filename, std::ios::in | std::ios::out);
     std::stringstream buffer;
     buffer << file.rdbuf();
-    std::cout << buffer.str();
+    std::cout << buffer.str() << "\n";
     file.close();
   }
 };
